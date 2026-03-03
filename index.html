@@ -207,17 +207,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
-      padding: 4px;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      padding: 0;
       border-radius: var(--radius-full);
       border: none;
       background: none;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
     }
-    .btn-close:hover { background: rgba(0,0,0,0.07); }
+    .btn-close:hover { opacity: 0.6; }
     .btn-close img { width: 20px; height: 20px; display: block; }
 
     /* ── DASHBOARD ─────────────────────────────────── */
