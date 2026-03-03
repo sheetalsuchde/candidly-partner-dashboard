@@ -29,8 +29,18 @@
       background: var(--surface-base);
       color: var(--text-primary);
       min-height: 100vh;
+    }
+
+    /* 1280px page wrapper */
+    .page {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      background: var(--surface-base);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
     }
 
     /* ── HEADER ─────────────────────────────────────── */
@@ -45,7 +55,6 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      min-width: 768px;
     }
 
     .header-side {
@@ -509,6 +518,7 @@
   </style>
 </head>
 <body>
+<div class="page">
 
   <!-- HEADER -->
   <header class="header">
@@ -712,5 +722,6 @@
     }
   </script>
 
+</div><!-- /.page -->
 </body>
 </html>
