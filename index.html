@@ -656,7 +656,7 @@
             <!-- Standard payoff — straight line (grey) -->
             <line x1="60" y1="50" x2="420" y2="232" stroke="#b0b5c0" stroke-width="2" stroke-linecap="round"/>
             <!-- Faster payoff — straight line (green dashed) -->
-            <line x1="60" y1="50" x2="290" y2="232" stroke="#34a853" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>
+            <line id="green-line" x1="60" y1="50" x2="290" y2="232" stroke="#34a853" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>
           </svg>
 
           <!-- Green endpoint marker: 16×16px HTML circle with checkmark
@@ -678,7 +678,7 @@
           <div class="chart-cards">
             <!-- Savings card -->
             <div class="savings-card">
-              <div class="amount">$3,643</div>
+              <div class="amount" id="savings-amount">$3,643</div>
               <div class="label">Money you'd save based on your goal.</div>
             </div>
 
@@ -720,7 +720,7 @@
         </div>
         <p class="info-heading">Set a goal on how much faster you want to become debt-free and we'll craft a plan for you to achieve it.</p>
         <div class="green-card">
-          <p>You will pay off your loan 2.1 years sooner by paying an extra $28 per month.</p>
+          <p id="info-panel-text">You will pay off your loan 2.1 years sooner by paying an extra $28 per month.</p>
           <div class="info-i">i</div>
         </div>
         <button class="cta-btn">
@@ -733,26 +733,86 @@
   </div>
 
   <script>
-    // Close alert
+    // ── Close alert ───────────────────────────────────────
     document.getElementById('alert-container')
       .querySelector('.btn-close')
       .addEventListener('click', () => {
         document.getElementById('alert-container').style.display = 'none';
       });
 
-    // Tab switching
+    // ── Tab switching ─────────────────────────────────────
     function setTab(el, listClass) {
       el.closest('.' + listClass).querySelectorAll('.tab-btn')
         .forEach(t => t.classList.remove('active'));
       el.classList.add('active');
     }
 
-    // Year stepper
-    let years = 2.1;
-    function adjustYears(delta) {
-      years = Math.max(0.1, Math.min(10, parseFloat((years + delta).toFixed(1))));
-      document.getElementById('years-display').textContent = years.toFixed(1) + ' years';
+    // ── Dynamic graph ─────────────────────────────────────
+    // SVG viewBox is 560×240.
+    // Grey (standard) line: fixed from (60,50) → (420,232).
+    // Green (faster) line:  starts at (60,50), endpoint x slides
+    //   from 420 (slider=0, no gain) → 60 (slider=100, max gain).
+    //   Formula: greenX = max(60, 420 - sliderVal * 3.6)
+    // At slider=30 (default): greenX = 420 - 108 = 312 → left% 55.7%
+    // We set the initial HTML marker to match this formula.
+
+    const VIEWBOX_W  = 560;
+    const VIEWBOX_H  = 240;
+    const LINE_Y_END = 232;   // y coordinate of both line endpoints
+    const GREY_X_END = 420;   // fixed grey line endpoint x
+    const GREEN_X_MIN = 60;   // leftmost green can go (x of start point)
+    const RANGE = 360;        // total x travel (420 - 60)
+
+    // Savings scale: slider=100 → $12,100, slider=30 → ~$3,630 ✓
+    const MAX_SAVINGS = 12100;
+    // Years scale:   slider=100 → 7.0 yrs, slider=30 → 2.1 yrs ✓
+    const MAX_YEARS   = 7.0;
+    // Monthly extra: slider=100 → $93, slider=30 → $28 ✓
+    const MAX_MONTHLY = 93;
+
+    function updateGraph(val) {
+      const pct = val / 100;
+
+      // 1. Green SVG line endpoint x
+      const greenX = Math.max(GREEN_X_MIN, GREY_X_END - pct * RANGE);
+      document.getElementById('green-line').setAttribute('x2', greenX);
+
+      // 2. Green HTML marker position (percentage of chart-area width/height)
+      const leftPct = (greenX / VIEWBOX_W * 100).toFixed(2);
+      const topPct  = (LINE_Y_END / VIEWBOX_H * 100).toFixed(2);
+      const greenMarker = document.querySelector('.green-marker');
+      greenMarker.style.left = leftPct + '%';
+      greenMarker.style.top  = topPct  + '%';
+
+      // 3. Years saved
+      const yearsSaved = (pct * MAX_YEARS).toFixed(1);
+      document.getElementById('years-display').textContent = yearsSaved + ' years';
+
+      // 4. Savings amount
+      const savings = Math.round(pct * MAX_SAVINGS);
+      document.getElementById('savings-amount').textContent =
+        '$' + savings.toLocaleString();
+
+      // 5. Slider gradient fill
+      const slider = document.getElementById('goal-slider');
+      slider.style.background =
+        `linear-gradient(to right, #265ddc ${val}%, #e0e2e8 ${val}%)`;
+
+      // 6. Info panel text
+      const monthly = Math.round(pct * MAX_MONTHLY);
+      const infoText = pct === 0
+        ? 'Move the slider to set your payoff goal.'
+        : `You will pay off your loan ${yearsSaved} years sooner by paying an extra $${monthly} per month.`;
+      document.getElementById('info-panel-text').textContent = infoText;
     }
+
+    // Wire up slider
+    document.getElementById('goal-slider').addEventListener('input', function () {
+      updateGraph(parseInt(this.value));
+    });
+
+    // Initialise to default slider value (30)
+    updateGraph(30);
   </script>
 
 </div><!-- /.page -->
