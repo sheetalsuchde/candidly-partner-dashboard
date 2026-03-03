@@ -334,6 +334,23 @@
       flex-shrink: 0;
     }
 
+    /* Endpoint markers — always perfectly round 16×16px HTML elements */
+    .endpoint-marker {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .grey-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #b0b5c0;
+    }
+
     /* Floating cards on chart */
     .chart-cards {
       position: absolute;
@@ -626,7 +643,7 @@
             Balance: $45,000
           </div>
 
-          <!-- Line chart -->
+          <!-- Line chart (lines only — endpoints are HTML overlays below) -->
           <svg class="chart-svg" viewBox="0 0 560 240" preserveAspectRatio="none">
             <!-- 5 dotted horizontal grid lines -->
             <line x1="0" y1="40"  x2="560" y2="40"  stroke="#d0d3dc" stroke-width="1" stroke-dasharray="4 4"/>
@@ -640,12 +657,22 @@
             <line x1="60" y1="50" x2="420" y2="232" stroke="#b0b5c0" stroke-width="2" stroke-linecap="round"/>
             <!-- Faster payoff — straight line (green dashed) -->
             <line x1="60" y1="50" x2="290" y2="232" stroke="#34a853" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>
-            <!-- Green endpoint -->
-            <circle cx="290" cy="232" r="9" fill="#34a853"/>
-            <path d="M 286 232 l 2.5 2.5 l 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <!-- Grey endpoint -->
-            <circle cx="420" cy="232" r="6" fill="#b0b5c0"/>
           </svg>
+
+          <!-- Green endpoint marker: 16×16px HTML circle with checkmark
+               positioned at viewBox point (290,232) → 51.8% / 96.7% -->
+          <div class="endpoint-marker green-marker" style="left:51.8%;top:96.7%;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="8" fill="#34a853"/>
+              <path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+
+          <!-- Grey endpoint marker: 16×16px HTML circle
+               positioned at viewBox point (420,232) → 75% / 96.7% -->
+          <div class="endpoint-marker grey-marker" style="left:75%;top:96.7%;">
+            <div class="grey-dot"></div>
+          </div>
 
           <!-- Floating cards -->
           <div class="chart-cards">
